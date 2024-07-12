@@ -1,13 +1,12 @@
 # Copyright (C) 2022 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
+from PySide6.QtCore import Signal, Slot
 from PySide6.QtPdfWidgets import QPdfView
 from PySide6.QtWidgets import QComboBox
-from PySide6.QtCore import Signal, Slot
 
 
 class ZoomSelector(QComboBox):
-
     zoom_mode_changed = Signal(QPdfView.ZoomMode)
     zoom_factor_changed = Signal(float)
 

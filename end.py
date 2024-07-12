@@ -8,7 +8,6 @@ import PySide6.QtWidgets
 
 import main
 import pdfbackend
-import start
 
 
 def getanswerfromsave(filename):
@@ -17,7 +16,7 @@ def getanswerfromsave(filename):
 
 
 def savegrades(grades):
-    filename = start.getsaveslot() + "Grade\Grade.txt"
+    filename = main.getsaveslot() + "\Grade\Grade.txt"
     with open(filename, 'wb') as fp:
         pickle.dump(grades, fp)
 
@@ -35,9 +34,10 @@ def calculategrades(answerlist, trueanswerlist):
     fieldscore = [0, 0, 0]
     trueanswerlist = [trueanswerlist[i].replace('\\\\', '\\') for i in range(len(trueanswerlist))]
     for k in range(len(answerlist) - 1):
-        i = shuffle[k]
+        i = k
         nowlist = getanswerfromsave(answerlist[k])
         truelist = getanswerfromsave(trueanswerlist[i])
+        print(nowlist, truelist)
         truelist.reverse()
         nowlist = [int(b) for b in nowlist]
         truelist = [int(b) for b in truelist]
@@ -59,7 +59,7 @@ class Window(PySide6.QtWidgets.QDialog):
 
     def __init__(self, answerlist, trueanswerlist):
         super().__init__(parent=None)
-        #self.connect(Window._on_destroyed)
+        # self.connect(Window._on_destroyed)
         self.setWindowTitle("End-screen")
         dialogLayout = PySide6.QtWidgets.QVBoxLayout()
         formLayout = PySide6.QtWidgets.QFormLayout()

@@ -1,13 +1,19 @@
-import os
 import pickle
-import sys
-from pypdf import PdfReader
-import pymupdf
 import re
+import sys
 
-import start
+import PIL.Image
+import pymupdf
+import pytesseract
+from pypdf import PdfReader
 
 gradingkey = []
+saveslot = ""
+
+
+def getsaveslot():
+    global saveslot
+    return saveslot
 
 
 def fillrange(seplist):
@@ -72,7 +78,7 @@ def getanswers(answerpage):
 
 
 def saveanswers(answerlist, counter):
-    appdata = start.getsaveslot() + r"Answers\\" + str(counter) + ".txt"
+    appdata = getsaveslot() + r"\Answers\\" + str(counter) + ".txt"
     with open(appdata, 'wb') as fp:
         pickle.dump(answerlist, fp)
     return appdata
@@ -82,7 +88,7 @@ def savetrueanswers(answerlist, chapternames):
     counter = 0
     trueanswerlist = []
     for i in range(len(answerlist)):
-        appdata = start.getsaveslot() + "Trueanswers\\" + str(i) + "-" + str(chapternames[i]) + ".txt"
+        appdata = getsaveslot() + "\Trueanswers\\" + str(i) + "-" + str(chapternames[i]) + ".txt"
         trueanswerlist.append(appdata)
         with open(appdata, 'wb') as fp:
             pickle.dump(answerlist[i], fp)
@@ -90,7 +96,7 @@ def savetrueanswers(answerlist, chapternames):
 
 
 def createchapterfiles(filename, pagelist):
-    appdata = start.getsaveslot() + "Chapters"
+    appdata = getsaveslot() + "\Chapters"
     filenames = []
     for i in pagelist.keys():
         ogfile = pymupdf.open(filename)
@@ -157,6 +163,21 @@ def extractgradingkey2(gradepage):
     return gradingkey
 
 
+def extractgradingkeyfull(gradepage, reader):
+    rect = pymupdf.Rect(pymupdf.Point(100, 350), pymupdf.Point(500, 630))
+    ogfile = pymupdf.open('C:\Temp\simtrue.pdf')
+    img = ogfile[71]
+    img.set_cropbox(rect)
+    # print(img.get_textpage().extractText(sort=True))
+    textdict = img.get_textpage().extractDICT()
+    imgtext = PIL.Image.open('C:\Temp\simimg.png')
+    predict = pytesseract.image_to_string(imgtext)
+    sys.exit(0)
+    imgtext.save('C:\Temp\simimg.png')
+    ogfile.select([71])
+    ogfile.save('C:\Temp\simtrue2.pdf')
+
+
 def convertonscale(OldMin, OldMax, NewMin, NewMax, OldValue):
     OldRange = (OldMax - OldMin)
     if (OldRange == 0):
@@ -219,13 +240,16 @@ def givefinalscores(rawscores):
     return totalscore, totalmathscore, totalhebscore
 
 
+# Cem Arkohen
+# https://www.facebook.com/groups/772946566154452
 def getgradingkey():
     global gradingkey
     return gradingkey
 
 
-def main(filename):
-    global gradingkey
+def main(filename, saveslotnew):
+    global gradingkey, saveslot
+    saveslot = saveslotnew
     reader = PdfReader(filename)
     pagelist = {'1': [4, 11], '2': [12, 19], '3': [20, 27], '4': [28, 35], '5': [36, 43],
                 '6': [44, 51]}  # splitchapters(reader)
@@ -240,9 +264,32 @@ def main(filename):
     return examnames, answers, chapternames, trueanswerlist
 
 
+def classifychapters(answerlist):
+    list2 = []
+    for item in answerlist:
+        if ('p' in item):
+            list2.append(3)
+        elif (len(item) == 20):
+            list2.append(1)
+        elif (len(item) == 22):
+            list2.append(2)
+        else:
+            list2.append(0)
+    return list2
+
+
+def mainfullexam(filename, saveslotnew):
+    global gradingkey, saveslot
+    saveslot = saveslotnew
+    foldername = filename + '\\'
+    answers = pickle.load(open(foldername + 'answers.txt', 'rb'))
+    gradingkey = pickle.load(open(foldername + 'gradingkey.txt', 'rb'))
+    pagelist = pickle.load(open(foldername + 'pagelist.txt', 'rb'))
+    file = pymupdf.open(foldername + 'exam.pdf')
+    examnames = createchapterfiles(foldername + 'exam.pdf', pagelist)
+    answers = [list(item.replace('p', '')) for item in answers]
+    return examnames, answers, classifychapters(answers), savetrueanswers(answers, classifychapters(answers))
+
+
 if __name__ == '__main__':
-    main(r"E:\Storage\Appdata\Exams\Hebrew\2020\Hebrew-2020-2.pdf")
-    for year in os.listdir("E:/Storage/Appdata/Exams/Hebrew"):
-        for test in os.listdir("E:/Storage/Appdata/Exams/Hebrew/" + year):
-            main("E:/Storage/Appdata/Exams/Hebrew/" + year + '/' + test)
-            # sys.exit(0)
+    mainfullexam("C:\Temp\simtrue.pdf", 'a')

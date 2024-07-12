@@ -1,0 +1,11 @@
+ahhhhh
+Todo:
+Work on any computer-Done
+more save slots-Done
+remove bad ui elements-Done
+show actual grade-Done
+shuffle chapters-Done
+resume from save:Not now
+installer+exe:Last
+campusil version:Now
+essay grader:After Now

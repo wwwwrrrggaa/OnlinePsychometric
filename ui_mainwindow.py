@@ -7,22 +7,15 @@
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
-import sys
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-                            QMetaObject, QObject, QPoint, QRect,
-                            QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-                           QCursor, QFont, QFontDatabase, QGradient,
-                           QIcon, QImage, QKeySequence, QLinearGradient,
-                           QPainter, QPalette, QPixmap, QRadialGradient,
-                           QTransform)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
+                            QSize, Qt)
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import (QAction, QIcon)
 from PySide6.QtPdfWidgets import QPdfView
-from PySide6.QtWidgets import (QApplication, QHeaderView, QMainWindow, QMenu,
+from PySide6.QtWidgets import (QMenu,
                                QMenuBar, QSizePolicy, QSplitter, QStatusBar,
-                               QTabWidget, QToolBar, QTreeView, QVBoxLayout,
-                               QWidget)
-from PySide6.QtWidgets import QWidget, QPushButton, QApplication, QListWidget, QGridLayout, QLabel, QProgressBar
-from PySide6.QtCore import QTimer, QDateTime
+                               QTabWidget, QToolBar, QVBoxLayout)
+from PySide6.QtWidgets import QWidget, QPushButton, QListWidget, QGridLayout, QLabel, QProgressBar
 
 import main
 
@@ -78,9 +71,6 @@ class WinForm(QWidget):
 
     def endchapter(self):
         main.jumpnextchapter()
-
-
-import resources_rc
 
 
 class Ui_MainWindow(object):

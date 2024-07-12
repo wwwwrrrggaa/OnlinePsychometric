@@ -4,14 +4,14 @@
 import math
 import sys
 
+from PySide6.QtCore import QModelIndex, QPoint, QStandardPaths, QUrl, Slot
 from PySide6.QtPdf import QPdfBookmarkModel, QPdfDocument
 from PySide6.QtPdfWidgets import QPdfView
 from PySide6.QtWidgets import (QDialog, QFileDialog, QMainWindow, QMessageBox,
                                QSpinBox)
-from PySide6.QtCore import QModelIndex, QPoint, QStandardPaths, QUrl, Slot
 
-from zoomselector import ZoomSelector
 from ui_mainwindow import Ui_MainWindow
+from zoomselector import ZoomSelector
 
 ZOOM_MULTIPLIER = math.sqrt(2.0)
 

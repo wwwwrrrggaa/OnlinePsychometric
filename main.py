@@ -2,18 +2,15 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 import pickle
 import random
-import sys
 from argparse import ArgumentParser, RawTextHelpFormatter
 
-from PySide6.QtWidgets import QApplication, QWidget, QFormLayout, QLineEdit, QVBoxLayout, QComboBox
 from PySide6.QtCore import QCoreApplication, QUrl
+from PySide6.QtWidgets import QFormLayout, QComboBox
 
 import end
 import pdfbackend
-import start
 from mainwindow import MainWindow
 
-saveslot = start.getsaveslot()
 timelimit = "25:00"
 counter = -1
 filenames = []
@@ -26,7 +23,17 @@ chapternames = []
 trueanswerlist = []
 shuffle = [2, 0, 4, 1, 5, 3]
 random.shuffle(shuffle)
-pickle.dump(shuffle, open(saveslot + "Grade\Order.txt", 'wb'))
+saveslot = "ada"
+
+
+def updatesaveslot(value):
+    global saveslot
+    saveslot = r'C:\Users\Public\Appdata\Saves\\' + value
+
+
+def getsaveslot():
+    global saveslot
+    return saveslot
 
 
 def getshuffle():
@@ -44,9 +51,12 @@ def finishchapter():
 
 
 def jumpnextchapter():
-    global filenames, counter, answers
+    global filenames, counter, answers, typeexam
     finishchapter()
-    mainapp('asda', timelimit)
+    if (typeexam == 1):
+        mainapp('asda', timelimit)
+    else:
+        mainfullapp('asda', timelimit)
     # answer=answers[counter]
     # examname=filenames[counter]
 
@@ -66,8 +76,9 @@ def createanswerwidget(answers):
     return layout, boxesofanswer
 
 
-def mainapp(exam, timer):
-    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist
+def mainapp(exam, timer, *args):
+    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam
+    typeexam = 1
     if (counter == 5):
         finishchapter()
         w = end.Window(filesavelist, trueanswerlist)
@@ -83,10 +94,38 @@ def mainapp(exam, timer):
         w.showMaximized()
         ###end()
         if (counter == -1):
-            examnames, answers, chapternames, trueanswerlist = pdfbackend.main(exam)
+            updatesaveslot(args[0])
+            pickle.dump(shuffle, open(getsaveslot() + "\Grade\Order.txt", 'wb'))
+            examnames, answers, chapternames, trueanswerlist = pdfbackend.main(exam, getsaveslot())
         counter += 1
         layout, boxofanswers = createanswerwidget(answers[shuffle[counter]])
         w.open(QUrl.fromLocalFile(examnames[shuffle[counter]]))
         w.addanswers(layout)
         QCoreApplication.exec()
 
+
+def mainfullapp(exam, timer, *args):
+    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam
+    typeexam = 2
+    if (counter == 7):
+        finishchapter()
+        w = end.Window(filesavelist, trueanswerlist)
+        w.show()
+    else:
+        timelimit = timer
+        argument_parser = ArgumentParser(description="PDF Viewer",
+                                         formatter_class=RawTextHelpFormatter)
+        argument_parser.add_argument("file", help="The file to open",
+                                     nargs='?', type=str)
+        options = argument_parser.parse_args()
+        w = MainWindow()
+        w.showMaximized()
+        if (counter == -1):
+            updatesaveslot(args[0])
+            pickle.dump([0, 1, 2, 3, 4, 5, 6, 7], open(getsaveslot() + "\Grade\Order.txt", 'wb'))
+            examnames, answers, chapternames, trueanswerlist = pdfbackend.mainfullexam(exam, getsaveslot())
+        counter += 1
+        layout, boxofanswers = createanswerwidget(answers[counter])
+        w.open(QUrl.fromLocalFile(examnames[counter]))
+        w.addanswers(layout)
+        QCoreApplication.exec()
