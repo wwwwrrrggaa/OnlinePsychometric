@@ -52,6 +52,8 @@ class MainWindow(QMainWindow):
         self.ui.pdfView.setDocument(self.m_document)
 
         self.ui.pdfView.zoomFactorChanged.connect(self.m_zoomSelector.set_zoom_factor)
+        mode = QPdfView.PageMode.MultiPage
+        self.ui.pdfView.setPageMode(mode)
 
     def addanswers(self, layout):
         self.ui.tabWidget.setLayout(layout)
@@ -134,7 +136,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_actionContinuous_triggered(self):
         cont_checked = self.ui.actionContinuous.isChecked()
-        mode = QPdfView.PageMode.MultiPage if cont_checked else QPdfView.PageMode.SinglePage
+        mode = QPdfView.PageMode.MultiPage if not cont_checked else QPdfView.PageMode.SinglePage
         self.ui.pdfView.setPageMode(mode)
 
     @Slot()

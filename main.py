@@ -1,7 +1,6 @@
 # Copyright (C) 2022 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 import pickle
-import random
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 from PySide6.QtCore import QCoreApplication, QUrl
@@ -22,7 +21,6 @@ filesavelist = []
 chapternames = []
 trueanswerlist = []
 shuffle = [2, 0, 4, 1, 5, 3]
-random.shuffle(shuffle)
 saveslot = "ada"
 
 
@@ -77,7 +75,7 @@ def createanswerwidget(answers):
 
 
 def mainapp(exam, timer, *args):
-    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam
+    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam,shuffle
     typeexam = 1
     if (counter == 5):
         finishchapter()
@@ -95,8 +93,9 @@ def mainapp(exam, timer, *args):
         ###end()
         if (counter == -1):
             updatesaveslot(args[0])
-            pickle.dump(shuffle, open(getsaveslot() + "\Grade\Order.txt", 'wb'))
             examnames, answers, chapternames, trueanswerlist = pdfbackend.main(exam, getsaveslot())
+            with open(getsaveslot() + "\Grade\Order.txt", 'wb') as f:
+                pickle.dump([2, 0, 4, 1, 5, 3],f)
         counter += 1
         layout, boxofanswers = createanswerwidget(answers[shuffle[counter]])
         w.open(QUrl.fromLocalFile(examnames[shuffle[counter]]))
@@ -122,8 +121,8 @@ def mainfullapp(exam, timer, *args):
         w.showMaximized()
         if (counter == -1):
             updatesaveslot(args[0])
-            pickle.dump([0, 1, 2, 3, 4, 5, 6, 7], open(getsaveslot() + "\Grade\Order.txt", 'wb'))
             examnames, answers, chapternames, trueanswerlist = pdfbackend.mainfullexam(exam, getsaveslot())
+            pickle.dump([0, 1, 2, 3, 4, 5, 6, 7], open(getsaveslot() + "\Grade\Order.txt", 'wb'))
         counter += 1
         layout, boxofanswers = createanswerwidget(answers[counter])
         w.open(QUrl.fromLocalFile(examnames[counter]))

@@ -30,7 +30,8 @@ def getchapterscore(a, b):
 
 
 def calculategrades(answerlist, trueanswerlist):
-    shuffle = main.getshuffle()
+    shuffle = main.getsaveslot()
+    shuffle=pickle.load(open(shuffle+'\Grade\Order.txt','rb'))
     fieldscore = [0, 0, 0]
     trueanswerlist = [trueanswerlist[i].replace('\\\\', '\\') for i in range(len(trueanswerlist))]
     for k in range(len(answerlist) - 1):
@@ -39,16 +40,18 @@ def calculategrades(answerlist, trueanswerlist):
         truelist = getanswerfromsave(trueanswerlist[i])
         print(nowlist, truelist)
         truelist.reverse()
-        nowlist = [int(b) for b in nowlist]
-        truelist = [int(b) for b in truelist]
-        fieldscore[int(trueanswerlist[i][-5])] += getchapterscore(nowlist, truelist)
+        if ('p' in truelist):
+            pass
+        else:
+            nowlist = [int(b) for b in nowlist]
+            truelist = [int(b) for b in truelist]
+            fieldscore[int(trueanswerlist[i][-5])] += getchapterscore(nowlist, truelist)
 
     savegrades(fieldscore)
     a, b, c = pdfbackend.givefinalscores([str(i) for i in fieldscore])
     fieldscore.append(a)
     fieldscore.append(b)
     fieldscore.append(c)
-    print(fieldscore)
     return fieldscore
 
 

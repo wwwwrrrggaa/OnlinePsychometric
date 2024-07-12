@@ -6,6 +6,8 @@ remove bad ui elements-Done
 show actual grade-Done
 shuffle chapters-Done
 resume from save:Not now
-installer+exe:Last
-campusil version:Now
+campusil version:Done
+BugFixes:Now
+Manual checks:After Now
+installer+exe:After Now
 essay grader:After Now

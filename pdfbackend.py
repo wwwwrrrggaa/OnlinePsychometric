@@ -1,209 +1,12 @@
+import os
 import pickle
-import re
-import sys
-
-import PIL.Image
-import pymupdf
-import pytesseract
-from pypdf import PdfReader
-
+from pymupdf import open as pdfopen
 gradingkey = []
 saveslot = ""
 
-
-def getsaveslot():
-    global saveslot
-    return saveslot
-
-
-def fillrange(seplist):
-    chapterlist = {str(i + 1): [] for i in range(6)}
-    count = 1
-    for j in range(len(seplist) - 1):
-        i = seplist[j]
-        chapterlist[str(count)].append(seplist[count - 1])
-        chapterlist[str(count)].append(seplist[count] - 1)
-        count += 1
-    return chapterlist
-
-
-def splitchapters(reader):
-    seplist = []
-    pages = [reader.pages[i] for i in range(reader.get_num_pages())]
-    count = 0
-    for page in pages:
-        count += 1
-        search = "עמוד ריק"
-        search2 = "ריק"
-        search3 = "עמוד"
-        Text = page.extract_text()
-        research = re.search(search, Text)
-        if (research):
-            seplist.append(count)
-        elif (re.match(search2, Text) and re.match(search3, Text)):
-            seplist.append(count)
-
-    return fillrange(seplist)
-
-
-def swap(text_blocks):
-    for i in range(len(text_blocks)):
-        if (text_blocks[i].endswith('חשיבה מילולית')):
-            text_blocks[i] = 0
-        elif (text_blocks[i].endswith('חשיבה כמותית')):
-            text_blocks[i] = 1
-        else:
-            text_blocks[i] = 2
-    if (text_blocks[0] != text_blocks[1] != text_blocks[2]):
-        print("incorrect reading")
-        sys.exit(0)
-
-
-def verify(text_blocks, tabs, pagelist):
-    if (len(text_blocks) != len(tabs) != len(pagelist)):
-        print('incorrect reading!!!')
-        sys.exit(0)
-
-
-def getanswers(answerpage):
-    text_blocks = [i for i in answerpage.get_text().splitlines() if '-' in i][1:]
-    swap(text_blocks)
-    tabs = answerpage.find_tables()
-    answerslist = []
-    # print(f"{len(tabs.tables)} table(s) on {'answerpage'}")
-    for table in tabs:
-        ans = table.extract()[1][:-1]
-        answerslist.append(ans)
-    return answerslist, text_blocks
-
-
-def saveanswers(answerlist, counter):
-    appdata = getsaveslot() + r"\Answers\\" + str(counter) + ".txt"
-    with open(appdata, 'wb') as fp:
-        pickle.dump(answerlist, fp)
-    return appdata
-
-
-def savetrueanswers(answerlist, chapternames):
-    counter = 0
-    trueanswerlist = []
-    for i in range(len(answerlist)):
-        appdata = getsaveslot() + "\Trueanswers\\" + str(i) + "-" + str(chapternames[i]) + ".txt"
-        trueanswerlist.append(appdata)
-        with open(appdata, 'wb') as fp:
-            pickle.dump(answerlist[i], fp)
-    return trueanswerlist
-
-
-def createchapterfiles(filename, pagelist):
-    appdata = getsaveslot() + "\Chapters"
-    filenames = []
-    for i in pagelist.keys():
-        ogfile = pymupdf.open(filename)
-        pagezone = pagelist[i]
-        chapterfile = appdata + '\\' + "chapter-" + i + ".pdf"
-        filenames.append(chapterfile)
-        ogfile.select(range(pagezone[0], pagezone[1]))
-        ogfile.save(chapterfile)
-        ogfile.close()
-    return filenames
-
-
-def checkperentry(containlist, checkstring):
-    for letterr in containlist:
-        if (letterr in checkstring):
-            return True
-        else:
-            return False
-
-
-def checklist(list):
-    hebrewletters = 'ראטוןםםפשדגכעייחלךףזסבהנמצתץ'
-    hebrewletters = [i for i in hebrewletters]
-    counter = 0
-    for item in list:
-        if (item.isnumeric()):
-            counter += 1
-    if (counter > len(list) / 2):
-        return True
-    else:
-        return False
-
-
-def extractgradingkey(gradepage):
-    tables = gradepage.find_tables()
-    gradingkey = {str(i): [] for i in range(47)}
-    for tab in tables:
-        for gradekey in tab.extract():
-            if (len(gradekey) == 4 and None not in gradekey):
-                gradingkey[gradekey[-1]] = gradekey[:-1]
-    if (gradingkey['4'] == []):
-        return extractgradingkey2(gradepage)
-    else:
-        return gradingkey
-
-
-def remove_values_from_list(the_list, val):
-    return [value for value in the_list if value != val]
-
-
-def extractgradingkey2(gradepage):
-    tables = gradepage.find_tables()
-    gradingkey = {str(i): [] for i in range(47)}
-    for tab in tables:
-        for gradekey in tab.extract():
-            if (len(gradekey) == 14):
-                gradekey = remove_values_from_list(gradekey, None)
-                if (checklist(gradekey)):
-                    if (len(gradekey) == 13):
-                        gradekey.remove('')
-                    chunks = [gradekey[x:x + 4] for x in range(0, len(gradekey), 4)]
-                    for chunk in chunks:
-                        gradingkey[chunk[-1]] = chunk[:-1]
+def getgradingkey():
+    global gradingkey
     return gradingkey
-
-
-def extractgradingkeyfull(gradepage, reader):
-    rect = pymupdf.Rect(pymupdf.Point(100, 350), pymupdf.Point(500, 630))
-    ogfile = pymupdf.open('C:\Temp\simtrue.pdf')
-    img = ogfile[71]
-    img.set_cropbox(rect)
-    # print(img.get_textpage().extractText(sort=True))
-    textdict = img.get_textpage().extractDICT()
-    imgtext = PIL.Image.open('C:\Temp\simimg.png')
-    predict = pytesseract.image_to_string(imgtext)
-    sys.exit(0)
-    imgtext.save('C:\Temp\simimg.png')
-    ogfile.select([71])
-    ogfile.save('C:\Temp\simtrue2.pdf')
-
-
-def convertonscale(OldMin, OldMax, NewMin, NewMax, OldValue):
-    OldRange = (OldMax - OldMin)
-    if (OldRange == 0):
-        NewValue = NewMin
-    else:
-        NewRange = (NewMax - NewMin)
-        NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
-    return NewValue
-
-
-def extractmyrange(page):
-    rangea = [(50, 50), (51, 55), (56, 60), (61, 65), (66, 70), (71, 75), (76, 80), (81, 85), (86, 90), (91, 95),
-              (96, 100), (101, 105), (106, 110), (111, 115), (116, 120), (121, 125), (126, 130), (131, 135), (136, 140),
-              (141, 145), (146, 149), (150, 150)]
-    rangeb = [(200, 200), (221, 248), (249, 276), (277, 304), (305, 333), (334, 361), (362, 389), (390, 418),
-              (419, 446), (447, 474), (475, 503), (504, 531), (532, 559), (560, 587), (588, 616), (617, 644),
-              (645, 672), (673, 701), (702, 729), (730, 761), (762, 795), (800, 800)]
-    finalgradingkey = {}
-    for gradeclassindex in range(len(rangea)):
-        gradeclass = rangea[gradeclassindex]
-        for grade in range(gradeclass[0], gradeclass[1] + 1):
-            newgrade = convertonscale(*rangea[gradeclassindex], *rangeb[gradeclassindex], grade)
-            finalgradingkey[str(grade)] = str(round(newgrade))
-
-    return finalgradingkey
-
 
 def givefinalscores(rawscores):
     gradingkey = getgradingkey()
@@ -239,30 +42,11 @@ def givefinalscores(rawscores):
     totalmathscore = finalgradingkey[str(int((1 * hebscore + 3 * mathscore + engscore) / 5.0))]
     return totalscore, totalmathscore, totalhebscore
 
-
-# Cem Arkohen
-# https://www.facebook.com/groups/772946566154452
-def getgradingkey():
-    global gradingkey
-    return gradingkey
-
-
-def main(filename, saveslotnew):
-    global gradingkey, saveslot
-    saveslot = saveslotnew
-    reader = PdfReader(filename)
-    pagelist = {'1': [4, 11], '2': [12, 19], '3': [20, 27], '4': [28, 35], '5': [36, 43],
-                '6': [44, 51]}  # splitchapters(reader)
-    file = pymupdf.open(filename)
-    pages = [file[i] for i in range(reader.get_num_pages())]
-    gradingkey = extractgradingkey(pages[-3])
-    pages = pages[:-3]
-    examnames = createchapterfiles(filename, pagelist)
-    answers, chapternames = getanswers(pages[-1])
-    verify(chapternames, answers, pagelist)
-    trueanswerlist = savetrueanswers(answers, chapternames)
-    return examnames, answers, chapternames, trueanswerlist
-
+def saveanswers(answerlist, counter):
+    appdata = getsaveslot() + r"\Answers\\" + str(counter) + ".txt"
+    with open(appdata, 'wb') as fp:
+        pickle.dump(answerlist, fp)
+    return appdata
 
 def classifychapters(answerlist):
     list2 = []
@@ -276,20 +60,70 @@ def classifychapters(answerlist):
         else:
             list2.append(0)
     return list2
+def getsaveslot():
+    global saveslot
+    return saveslot
+def fillrange(seplist):
+    chapterlist = {str(i + 1): [] for i in range(6)}
+    count = 1
+    for j in range(len(seplist) - 1):
+        i = seplist[j]
+        chapterlist[str(count)].append(seplist[count - 1])
+        chapterlist[str(count)].append(seplist[count] - 1)
+        count += 1
+    return chapterlist
 
+def createchapterfiles(filename, pagelist):
+    appdata = getsaveslot() + "\Chapters"
+    filenames = []
+    for i in pagelist.keys():
+        ogfile = pdfopen(filename)
+        pagezone = pagelist[i]
+        chapterfile = appdata + '\\' + "chapter-" + i + ".pdf"
+        filenames.append(chapterfile)
+        ogfile.select(range(pagezone[0], pagezone[1]))
+        ogfile.save(chapterfile)
+        ogfile.close()
+    return filenames
 
+def wipesaveslot(saveslot):
+    for folder in os.listdir(saveslot):
+        for file in os.listdir(saveslot+r'\\'+folder):
+            os.remove(saveslot+r'\\'+folder+r'\\'+file)
+
+def savetrueanswers(answerlist, chapternames):
+    counter = 0
+    trueanswerlist = []
+    for i in range(len(answerlist)):
+        appdata = getsaveslot() + "\Trueanswers\\" + str(i) + "-" + str(chapternames[i]) + ".txt"
+        trueanswerlist.append(appdata)
+        with open(appdata, 'wb') as fp:
+            pickle.dump(answerlist[i], fp)
+    return trueanswerlist
 def mainfullexam(filename, saveslotnew):
     global gradingkey, saveslot
     saveslot = saveslotnew
+    wipesaveslot(saveslot)
     foldername = filename + '\\'
     answers = pickle.load(open(foldername + 'answers.txt', 'rb'))
     gradingkey = pickle.load(open(foldername + 'gradingkey.txt', 'rb'))
     pagelist = pickle.load(open(foldername + 'pagelist.txt', 'rb'))
-    file = pymupdf.open(foldername + 'exam.pdf')
+    file = pdfopen(foldername + 'exam.pdf')
     examnames = createchapterfiles(foldername + 'exam.pdf', pagelist)
-    answers = [list(item.replace('p', '')) for item in answers]
+    answers = [list(item) for item in answers]
     return examnames, answers, classifychapters(answers), savetrueanswers(answers, classifychapters(answers))
 
-
+def main(filename, saveslotnew):
+    global gradingkey, saveslot
+    saveslot = saveslotnew
+    wipesaveslot(saveslot)
+    foldername = filename + '\\'
+    answers = pickle.load(open(foldername + 'answers.txt', 'rb'))
+    gradingkey = pickle.load(open(foldername + 'gradingkey.txt', 'rb'))
+    pagelist = pickle.load(open(foldername + 'pagelist.txt', 'rb'))
+    file = pdfopen(foldername + 'exam.pdf')
+    examnames = createchapterfiles(foldername + 'exam.pdf', pagelist)
+    answers = [list(item) for item in answers]
+    return examnames, answers, classifychapters(answers), savetrueanswers(answers, classifychapters(answers))
 if __name__ == '__main__':
     mainfullexam("C:\Temp\simtrue.pdf", 'a')

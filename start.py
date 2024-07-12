@@ -100,22 +100,19 @@ class Window(QDialog):
 
     def Start(self):
         global exam, timer, saveslot, examtype
-        if (self.Box0.currentText() == "Exams"):
-            exam = getexamsfolder(
-                self.Box0.currentText()) + self.Box1.currentText() + '\\' + self.Box2.currentText() + '\\' + self.Box1.currentText() + '-' + self.Box2.currentText() + '-' + self.Box3.currentText() + '.pdf'
-        else:
-            exam = getexamsfolder(
-                self.Box0.currentText()) + self.Box1.currentText() + '\\' + self.Box2.currentText() + '\\' + self.Box3.currentText()
-
-        if (os.path.isfile(exam)):
-            updatesaveslot(self.Box5.currentText())
-            timer = self.Box4.currentText()
-            self.close()
-        elif (os.path.isdir(exam)):
-            updatesaveslot(self.Box5.currentText())
-            timer = self.Box4.currentText()
-            self.close()
-            examtype = 2
+        exam = getexamsfolder(
+            self.Box0.currentText()) + self.Box1.currentText() + '\\' + self.Box2.currentText() + '\\' + self.Box3.currentText()
+        if (os.path.isdir(exam)):
+            if (self.Box0.currentText() == "Exams"):
+                updatesaveslot(self.Box5.currentText())
+                timer = self.Box4.currentText()
+                self.close()
+                examtype=1
+            else:
+                updatesaveslot(self.Box5.currentText())
+                timer = self.Box4.currentText()
+                self.close()
+                examtype = 2
         else:
             pass
 
