@@ -1,4 +1,6 @@
 # dialog.py
+import shutil
+
 appdatafolder = r"C:\Users\Public\Appdata"
 examsfolder = r"C:\Users\Public\Appdata\Exams\\"
 saveslot = r"C:\Users\Public\Appdata\Saves\save1"
@@ -50,6 +52,7 @@ def getlanguage():
 def getyears(type, language):
     path = getexamsfolder(type) + language
     listyear = []
+
     for year in os.listdir(path):
         listyear.append(year)
     return listyear
@@ -107,12 +110,14 @@ class Window(QDialog):
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
-                examtype=1
+                examtype = 1
             else:
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
                 examtype = 2
+            imgpath = exam + r'\\answer.png'
+            shutil.copy(imgpath, r"C:\Users\Public\Appdata\Saves\\" + getsaveslot() + r"\images\answer.png")
         else:
             pass
 

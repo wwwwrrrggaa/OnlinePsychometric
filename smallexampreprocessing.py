@@ -3,8 +3,9 @@ import pickle
 import re
 import shutil
 import sys
+
 from pymupdf import open as pdfopen
-import pypdf
+
 gradingkey = []
 saveslot = ""
 

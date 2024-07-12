@@ -1,12 +1,16 @@
 import os
 import pickle
+
 from pymupdf import open as pdfopen
+
 gradingkey = []
 saveslot = ""
+
 
 def getgradingkey():
     global gradingkey
     return gradingkey
+
 
 def givefinalscores(rawscores):
     gradingkey = getgradingkey()
@@ -35,18 +39,20 @@ def givefinalscores(rawscores):
                            '753', '145': '761', '146': '762', '147': '773', '148': '784', '149': '795', '150': '800'}
     hebscore, mathscore, engscore = rawscores
     hebscore = int(gradingkey[hebscore][0])
-    mathscore = int(gradingkey[mathscore][0])
-    engscore = int(gradingkey[engscore][0])
+    mathscore = int(gradingkey[mathscore][1])
+    engscore = int(gradingkey[engscore][2])
     totalscore = finalgradingkey[str(int((2 * hebscore + 2 * mathscore + engscore) / 5.0))]
     totalhebscore = finalgradingkey[str(int((3 * hebscore + 1 * mathscore + engscore) / 5.0))]
     totalmathscore = finalgradingkey[str(int((1 * hebscore + 3 * mathscore + engscore) / 5.0))]
     return totalscore, totalmathscore, totalhebscore
+
 
 def saveanswers(answerlist, counter):
     appdata = getsaveslot() + r"\Answers\\" + str(counter) + ".txt"
     with open(appdata, 'wb') as fp:
         pickle.dump(answerlist, fp)
     return appdata
+
 
 def classifychapters(answerlist):
     list2 = []
@@ -60,9 +66,13 @@ def classifychapters(answerlist):
         else:
             list2.append(0)
     return list2
+
+
 def getsaveslot():
     global saveslot
     return saveslot
+
+
 def fillrange(seplist):
     chapterlist = {str(i + 1): [] for i in range(6)}
     count = 1
@@ -72,6 +82,7 @@ def fillrange(seplist):
         chapterlist[str(count)].append(seplist[count] - 1)
         count += 1
     return chapterlist
+
 
 def createchapterfiles(filename, pagelist):
     appdata = getsaveslot() + "\Chapters"
@@ -86,10 +97,13 @@ def createchapterfiles(filename, pagelist):
         ogfile.close()
     return filenames
 
+
 def wipesaveslot(saveslot):
     for folder in os.listdir(saveslot):
-        for file in os.listdir(saveslot+r'\\'+folder):
-            os.remove(saveslot+r'\\'+folder+r'\\'+file)
+        if (folder != "images"):
+            for file in os.listdir(saveslot + r'\\' + folder):
+                os.remove(saveslot + r'\\' + folder + r'\\' + file)
+
 
 def savetrueanswers(answerlist, chapternames):
     counter = 0
@@ -100,6 +114,8 @@ def savetrueanswers(answerlist, chapternames):
         with open(appdata, 'wb') as fp:
             pickle.dump(answerlist[i], fp)
     return trueanswerlist
+
+
 def mainfullexam(filename, saveslotnew):
     global gradingkey, saveslot
     saveslot = saveslotnew
@@ -113,6 +129,7 @@ def mainfullexam(filename, saveslotnew):
     answers = [list(item) for item in answers]
     return examnames, answers, classifychapters(answers), savetrueanswers(answers, classifychapters(answers))
 
+
 def main(filename, saveslotnew):
     global gradingkey, saveslot
     saveslot = saveslotnew
@@ -125,5 +142,7 @@ def main(filename, saveslotnew):
     examnames = createchapterfiles(foldername + 'exam.pdf', pagelist)
     answers = [list(item) for item in answers]
     return examnames, answers, classifychapters(answers), savetrueanswers(answers, classifychapters(answers))
+
+
 if __name__ == '__main__':
     mainfullexam("C:\Temp\simtrue.pdf", 'a')

@@ -65,9 +65,13 @@ def givetimelimit():
 
 
 def createanswerwidget(answers):
+    if('p' in answers):
+        minus=1
+    else:
+        minus=0
     layout = QFormLayout()
-    boxesofanswer = [0 for i in range(len(answers))]
-    for index in range(len(answers)):
+    boxesofanswer = [0 for i in range(len(answers)-minus)]
+    for index in range(len(answers)-minus):
         boxesofanswer[index] = QComboBox()
         boxesofanswer[index].addItems(["1", "2", "3", "4"])
         layout.addRow(str(index + 1), boxesofanswer[index])
@@ -80,7 +84,7 @@ def mainapp(exam, timer, *args):
     if (counter == 5):
         finishchapter()
         w = end.Window(filesavelist, trueanswerlist)
-        w.show()
+        w.showMaximized()
     else:
         timelimit = timer
         argument_parser = ArgumentParser(description="PDF Viewer",
@@ -100,6 +104,7 @@ def mainapp(exam, timer, *args):
         layout, boxofanswers = createanswerwidget(answers[shuffle[counter]])
         w.open(QUrl.fromLocalFile(examnames[shuffle[counter]]))
         w.addanswers(layout)
+
         QCoreApplication.exec()
 
 
@@ -109,7 +114,7 @@ def mainfullapp(exam, timer, *args):
     if (counter == 7):
         finishchapter()
         w = end.Window(filesavelist, trueanswerlist)
-        w.show()
+        w.showMaximized()
     else:
         timelimit = timer
         argument_parser = ArgumentParser(description="PDF Viewer",

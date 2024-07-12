@@ -1,5 +1,6 @@
 import os
 import pickle
+import sys
 
 import pymupdf
 
@@ -189,6 +190,17 @@ def getpagelist(filename):
     picklesave(texttrueform, newfilename)
 
 
+def addimage(filename):
+    rect = pymupdf.Rect(pymupdf.Point(90, 80), pymupdf.Point(560, 800))
+    ogfile = pymupdf.open(filename)
+    crop = ogfile[-8]
+    crop.set_cropbox(rect)
+    pixmap = crop.get_pixmap()
+    imgsave = filename.replace('exam.pdf', 'answer.png')
+    pixmap.pil_save(imgsave)
+    return crop
+
+
 def preprocessing(filename, pdffile):
     # getpagelist(filename)
     # pagelist = {'1': [4, 11], '2': [12, 19], '3': [20, 27], '4': [28, 35], '5': [36, 43],
@@ -196,7 +208,7 @@ def preprocessing(filename, pdffile):
     # file = pymupdf.open(filename)
     # gradingkey = cropgradingkey(filename)
     # cropanswers(filename)
-    gradingkey = getgradingkey(filename.replace('tests', 'hotfolder').replace('.pdf', '_ocred (2).pdf'))
+    # gradingkey = getgradingkey(filename.replace('tests', 'hotfolder').replace('.pdf', '_ocred (2).pdf'))
     # answers=testianswers(filename)
     # examname=pdffile.replace('.pdf','')
     # dir=r"C:\Users\Public\Appdata\FullExams\\"+examname+'\\'
@@ -205,6 +217,7 @@ def preprocessing(filename, pdffile):
     # picklesave(pagelist,dir+"pagelist.txt")
     # picklesave(gradingkey,dir+"gradingkey.txt")
     # picklesave(answers,dir+"answers.txt")
+    pass
 
 
 def picklesave(data, filename):
@@ -213,5 +226,12 @@ def picklesave(data, filename):
 
 
 if __name__ == '__main__':
-    for pdffile in os.listdir(r"C:\Users\Public\Appdata\tests"):
-        preprocessing(r"C:\Users\Public\Appdata\tests\\" + pdffile, pdffile)
+    errorFormat = '<span style="color:red;">{}</span>'
+    print('a' + errorFormat.format('b'))
+    sys.exit(0)
+    sep = r"\\"
+    folder = r"C:\Users\Public\Appdata\FullExams\Hebrew"
+    for yearfolder in os.listdir(folder):
+        for quarter in os.listdir(folder + sep + yearfolder):
+            filename = folder + sep + yearfolder + sep + quarter + sep + "exam.pdf"
+            # addimage(filename)
