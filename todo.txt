@@ -12,3 +12,4 @@ Manual checks:After Now
 installer+exe:After Now
 essay grader:After Now
 End screen:Now
+###>python -m nuitka --follow-imports --standalone --enable-plugin=pyside6 C:\Users\yonat\OneDrive\Documents\pycharmprojects\OnlinePsychometric\start.py

@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
 
     def addanswers(self, layout):
         self.ui.tabWidget.setLayout(layout)
-
+        self.ui.tabWidget.setMinimumWidth(75)
     # remove
     @Slot(QUrl)
     def open(self, doc_location):
