@@ -12,4 +12,3 @@ Manual checks:After Now
 installer+exe:After Now
 essay grader:After Now
 End screen:Now
-Installer:Maybe

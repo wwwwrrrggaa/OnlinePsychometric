@@ -36,7 +36,7 @@ def getchapterscore(a, b):
 
         else:
             wronguser.append(errorFormat.format(str(a[i])))
-            wrongcorrect.append(correctFormat.format(str(a[i])))
+            wrongcorrect.append(correctFormat.format(str(b[i])))
     return sum, wronguser, wrongcorrect
 
 
@@ -127,6 +127,7 @@ class Window(PySide6.QtWidgets.QDialog):
         engrawscore = 0
         answerLayout.setSpacing(10)
         for i in range(len(alist)):
+            alist[i]=alist[i][::-1]
             if ('p' in tlist[i]):
                 tlist[i].remove('p')
                 grade, wronguser, wrongcorrect = getchapterscore(alist[i], tlist[i])
