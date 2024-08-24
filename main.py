@@ -58,10 +58,8 @@ def finishchapter():
 def jumpnextchapter():
     global filenames, counter, answers, typeexam
     finishchapter()
-    if typeexam == 1:
-        mainapp("asda", timelimit)
-    else:
-        mainfullapp("asda", timelimit)
+    mainapp("asda", timelimit)
+
     # answer=answers[counter]
     # examname=filenames[counter]
 
@@ -86,11 +84,12 @@ def createanswerwidget(answers):
 
 
 def mainapp(exam, timer, *args):
-    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam, shuffle,limit,backend
+    global timelimit, counter, answers, examnames, w, boxofanswers, chapternames, trueanswerlist, typeexam, shuffle,limit,backend,limit
     typeexam = 1
     if counter == limit:
         finishchapter()
         w = end.Window(filesavelist, trueanswerlist)
+        print("her")
         w.showMaximized()
     else:
         timelimit = timer
@@ -105,16 +104,18 @@ def mainapp(exam, timer, *args):
         w.showMaximized()
         ###end()
         if counter == -1:
-            limit=7 if args[0][2]==1 else 5
+            print(args)
+            limit=7 if args[0][2]==0 else 5
             saveslot=args[0][0]
 
             if(args[0][1]==0):
                 updatesaveslot(args[0][0])
-                examnames, answers, chapternames, trueanswerlist = backend[args[0][1]][args[0][1]](
+                examnames, answers, chapternames, trueanswerlist = backend[args[0][1]][args[0][2]](
                     exam, getsaveslot()
                 )
-                with open(getsaveslot() + "\Grade\Order.txt", "wb") as f:
-                    pickle.dump([2, 0, 4, 1, 5, 3], f)
+                if(args[0][1]==0):
+                    with open(getsaveslot() + "\Grade\Order.txt", "wb") as f:
+                        pickle.dump([2, 0, 4, 1, 5, 3], f)
             else:
                 updatesaveslot(args[0][0])
                 examnames, answers, chapternames, trueanswerlist,counter = pdfbackend.mainresume(saveslot)

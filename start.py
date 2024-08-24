@@ -40,7 +40,7 @@ from PySide6.QtWidgets import (
 
 timer = "25:00"
 exam = ""
-examtype = 1
+examtype = 0
 
 
 def getlanguage():
@@ -128,12 +128,12 @@ class Window(QDialog):
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
-                examtype = 1
+                examtype = 0
             else:
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
-                examtype = 0
+                examtype = 1
             imgpath = exam + r"\\answer.png"
             shutil.copy(
                 imgpath,

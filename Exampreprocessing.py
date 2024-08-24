@@ -11,19 +11,19 @@ def cropgradingkey(filename):
     crop = ogfile[-7]
     crop.set_cropbox(rect)
     img = crop.get_pixmap()
-    filename2 = filename.replace('tests', 'tests2')
+    filename2 = filename.replace("tests", "tests2")
     ogfile.select([ogfile.page_count - 7])
     ogfile.save(filename2)
 
 
 def verifynumeric(word):
-    if (len(word) == 0):
+    if len(word) == 0:
         return False
-    if (word.isnumeric()):
+    if word.isnumeric():
         return True
-    elif (word[-1].isnumeric()):
+    elif word[-1].isnumeric():
         return True
-    elif (word[0].isnumeric()):
+    elif word[0].isnumeric():
         return True
     return False
 
@@ -33,64 +33,93 @@ def getgradingkey(filename):
     ogfile = pymupdf.open(filename)
     page = ogfile[0]
     gradingkey = {}
-    text = [word for word in page.get_text().split('\n') if verifynumeric(word)]
+    text = [word for word in page.get_text().split("\n") if verifynumeric(word)]
     temp = []
     for index in range(len(text)):
         try:
             int(text[index])
         except ValueError:
-            text[index] = text[index].replace('ו2', '122')
-            text[index] = text[index].replace(' ', '')
-            text[index] = text[index].replace('ו', '')
-            text[index] = text[index].replace('.', '')
+            text[index] = text[index].replace("ו2", "122")
+            text[index] = text[index].replace(" ", "")
+            text[index] = text[index].replace("ו", "")
+            text[index] = text[index].replace(".", "")
 
         currentword = text[index]
-        if (int(text[index]) < 50):
+        if int(text[index]) < 50:
             # print(int(text[index]))
             gradingkey[text[index]] = temp
             temp = []
         else:
             temp.append(currentword)
     # print(gradingkey)
-    print('\n')
+    print("\n")
     # listcompare=[str(i) for i in range(1,0)]
     count = 0
     for i in range(0, 47):
-        if (str(i) not in gradingkey):
+        if str(i) not in gradingkey:
             # print(filename)
             # print(gradingkey)
             # print(text)
             count += 1
-        elif (len(gradingkey[str(i)]) == 0):
+        elif len(gradingkey[str(i)]) == 0:
             count += 1
             print(i)
-        elif (len(gradingkey[str(i)]) == 1):
+        elif len(gradingkey[str(i)]) == 1:
             gradingkey[str(i)] = [0, 0, gradingkey[str(i)][0]]
-        elif (len(gradingkey[str(i)]) == 2):
+        elif len(gradingkey[str(i)]) == 2:
             gradingkey[str(i)] = [gradingkey[str(i)][0], 0, gradingkey[str(i)][1]]
 
-    if (count != 0):
-        if (filename == r"C:\Users\Public\Appdata\hotfolder\\Sim_2109_ocred (2).pdf"):
-            gradingkey = {'0': ['50', '50', '50'], '1': ['52', '52', '51'], '2': ['54', '54', '52'],
-                          '3': ['56', '56', '53'], '4': ['58', '58', '54'], '5': ['60', '60', '55'],
-                          '6': ['62', '62', '57'],
-                          '7': ['64', '65', '59'], '8': ['66', '67', '61'], '9': ['68', '70', '63'],
-                          '10': ['70', '72', '65'], '11': ['72', '75', '67'], '12': ['75', '77', '69'],
-                          '13': ['77', '80', '72'],
-                          '14': ['80', '82', '74'], '15': ['82', '85', '76'], '16': ['84', '88', '78'],
-                          '17': ['87', '90', '81'], '18': ['89', '93', '83'], '19': ['92', '95', '86'],
-                          '20': ['94', '98', '88'],
-                          '21': ['96', '101', '90'], '22': ['98', '103', '93'], '23': ['101', '106', '95'],
-                          '24': ['103', '108', '98'], '25': ['105', '111', '100'], '26': ['107', '114', '102'],
-                          '27': ['110', '117', '104'],
-                          '28': ['112', '119', '107'], '29': ['115', '122', '109'], '30': ['117', '125', '111'],
-                          '31': ['119', '128', '114'], '32': ['122', '130', '116'], '33': ['124', '133', '119'],
-                          '34': ['127', '135', '121'],
-                          '35': ['129', '138', '124'], '36': ['132', '140', '126'], '37': ['134', '143', '128'],
-                          '38': ['137', '145', '131'], '39': ['139', '148', '133'], '40': ['142', '150', '135'],
-                          '41': ['144', 0, '138'],
-                          '42': ['146', 0, '140'], '43': ['148', 0, '143'], '44': ['150', 0, '145'],
-                          '45': [0, 0, '148'], '46': ['150']}
+    if count != 0:
+        if filename == r"C:\Users\Public\Appdata\hotfolder\\Sim_2109_ocred (2).pdf":
+            gradingkey = {
+                "0": ["50", "50", "50"],
+                "1": ["52", "52", "51"],
+                "2": ["54", "54", "52"],
+                "3": ["56", "56", "53"],
+                "4": ["58", "58", "54"],
+                "5": ["60", "60", "55"],
+                "6": ["62", "62", "57"],
+                "7": ["64", "65", "59"],
+                "8": ["66", "67", "61"],
+                "9": ["68", "70", "63"],
+                "10": ["70", "72", "65"],
+                "11": ["72", "75", "67"],
+                "12": ["75", "77", "69"],
+                "13": ["77", "80", "72"],
+                "14": ["80", "82", "74"],
+                "15": ["82", "85", "76"],
+                "16": ["84", "88", "78"],
+                "17": ["87", "90", "81"],
+                "18": ["89", "93", "83"],
+                "19": ["92", "95", "86"],
+                "20": ["94", "98", "88"],
+                "21": ["96", "101", "90"],
+                "22": ["98", "103", "93"],
+                "23": ["101", "106", "95"],
+                "24": ["103", "108", "98"],
+                "25": ["105", "111", "100"],
+                "26": ["107", "114", "102"],
+                "27": ["110", "117", "104"],
+                "28": ["112", "119", "107"],
+                "29": ["115", "122", "109"],
+                "30": ["117", "125", "111"],
+                "31": ["119", "128", "114"],
+                "32": ["122", "130", "116"],
+                "33": ["124", "133", "119"],
+                "34": ["127", "135", "121"],
+                "35": ["129", "138", "124"],
+                "36": ["132", "140", "126"],
+                "37": ["134", "143", "128"],
+                "38": ["137", "145", "131"],
+                "39": ["139", "148", "133"],
+                "40": ["142", "150", "135"],
+                "41": ["144", 0, "138"],
+                "42": ["146", 0, "140"],
+                "43": ["148", 0, "143"],
+                "44": ["150", 0, "145"],
+                "45": [0, 0, "148"],
+                "46": ["150"],
+            }
 
     print(gradingkey)
     # newfilename=convertfilename(filename)
@@ -109,20 +138,26 @@ def cropanswers(filename):
     ogfile = pymupdf.open(filename)
     crop = ogfile[-8]
     crop.set_cropbox(rect)
-    filename2 = filename.replace('tests', 'tests3')
+    filename2 = filename.replace("tests", "tests3")
     ogfile.select([ogfile.page_count - 8])
     ogfile.save(filename2)
 
 
 def textianswers(filename):
-    filename = filename.replace('tests', 'tests5')
-    filename = filename.replace('.pdf', '.txt')
-    f = open(filename, 'r')
+    filename = filename.replace("tests", "tests5")
+    filename = filename.replace(".pdf", ".txt")
+    f = open(filename, "r")
     lines = f.readlines()
     for index in range(len(lines)):
-        lines[index] = lines[index].replace('\t', '')
-        lines[index] = lines[index].replace(' ', '', )
-        lines[index] = lines[index].replace('\n', '', )
+        lines[index] = lines[index].replace("\t", "")
+        lines[index] = lines[index].replace(
+            " ",
+            "",
+        )
+        lines[index] = lines[index].replace(
+            "\n",
+            "",
+        )
     # print([i for i in lines],filename)
     return lines
 
@@ -130,7 +165,7 @@ def textianswers(filename):
 def verify(text):
     A = "עמוד"
     B = "ריק"
-    if (A in text and B in text):
+    if A in text and B in text:
         return True
     return False
 
@@ -146,36 +181,36 @@ def convertfilename(filename):
     year = firstsplit[0:2]
     quarter = firstsplit[2:4]
     year = "20" + year
-    if (quarter == "01"):
+    if quarter == "01":
         quarter = "1"
-    elif (quarter == "02"):
+    elif quarter == "02":
         quarter = "1"
-    elif (quarter == "03"):
+    elif quarter == "03":
         quarter = "1"
-    elif (quarter == "04"):
+    elif quarter == "04":
         quarter = "1"
-    elif (quarter == "05"):
+    elif quarter == "05":
         quarter = "2"
-    elif (quarter == "06"):
+    elif quarter == "06":
         quarter = "2"
-    elif (quarter == "07"):
+    elif quarter == "07":
         quarter = "2"
-    elif (quarter == "08"):
+    elif quarter == "08":
         quarter = "3"
-    elif (quarter == "09"):
+    elif quarter == "09":
         quarter = "3"
-    elif (quarter == "10"):
+    elif quarter == "10":
         quarter = "4"
-    elif (quarter == "11"):
+    elif quarter == "11":
         quarter = "4"
-    elif (quarter == "12"):
+    elif quarter == "12":
         quarter = "4"
     globlist[int(year)].append(quarter)
     filename = r"C:\Users\Public\Appdata\FullExams\Hebrew\2021\2\gradingkey.txt"
     filename = filename.replace("2021", year)
     filename = list(filename)
     filename[-16] = quarter
-    filename = ''.join(filename)
+    filename = "".join(filename)
     return filename
 
 
@@ -196,7 +231,7 @@ def addimage(filename):
     crop = ogfile[-8]
     crop.set_cropbox(rect)
     pixmap = crop.get_pixmap()
-    imgsave = filename.replace('exam.pdf', 'answer.png')
+    imgsave = filename.replace("exam.pdf", "answer.png")
     pixmap.pil_save(imgsave)
     return crop
 
@@ -221,13 +256,13 @@ def preprocessing(filename, pdffile):
 
 
 def picklesave(data, filename):
-    with open(filename, 'wb') as fp:
+    with open(filename, "wb") as fp:
         pickle.dump(data, fp)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     errorFormat = '<span style="color:red;">{}</span>'
-    print('a' + errorFormat.format('b'))
+    print("a" + errorFormat.format("b"))
     sys.exit(0)
     sep = r"\\"
     folder = r"C:\Users\Public\Appdata\FullExams\Hebrew"
