@@ -7,8 +7,7 @@ import sys
 from PySide6.QtCore import QModelIndex, QPoint, QStandardPaths, QUrl, Slot
 from PySide6.QtPdf import QPdfBookmarkModel, QPdfDocument
 from PySide6.QtPdfWidgets import QPdfView
-from PySide6.QtWidgets import (QDialog, QFileDialog, QMainWindow, QMessageBox,
-                               QSpinBox)
+from PySide6.QtWidgets import QDialog, QFileDialog, QMainWindow, QMessageBox, QSpinBox
 
 from ui_mainwindow import Ui_MainWindow
 from zoomselector import ZoomSelector
@@ -58,6 +57,7 @@ class MainWindow(QMainWindow):
     def addanswers(self, layout):
         self.ui.tabWidget.setLayout(layout)
         self.ui.tabWidget.setMinimumWidth(75)
+
     # remove
     @Slot(QUrl)
     def open(self, doc_location):
@@ -90,7 +90,9 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_actionOpen_triggered(self):
         if not self.m_fileDialog:
-            directory = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
+            directory = QStandardPaths.writableLocation(
+                QStandardPaths.DocumentsLocation
+            )
             self.m_fileDialog = QFileDialog(self, "Choose a PDF", directory)
             self.m_fileDialog.setAcceptMode(QFileDialog.AcceptOpen)
             self.m_fileDialog.setMimeTypeFilters(["application/pdf"])
@@ -106,8 +108,11 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_actionAbout_triggered(self):
-        QMessageBox.about(self, "About OnlinePsychometric",
-                          "Prototype digital version of the regular exam")
+        QMessageBox.about(
+            self,
+            "About OnlinePsychometric",
+            "Prototype digital version of the regular exam",
+        )
 
     @Slot()
     def on_actionAbout_Qt_triggered(self):
@@ -136,7 +141,11 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_actionContinuous_triggered(self):
         cont_checked = self.ui.actionContinuous.isChecked()
-        mode = QPdfView.PageMode.MultiPage if not cont_checked else QPdfView.PageMode.SinglePage
+        mode = (
+            QPdfView.PageMode.MultiPage
+            if not cont_checked
+            else QPdfView.PageMode.SinglePage
+        )
         self.ui.pdfView.setPageMode(mode)
 
     @Slot()

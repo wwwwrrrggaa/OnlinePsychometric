@@ -12,13 +12,13 @@ import pdfbackend
 
 
 def getanswerfromsave(filename):
-    with open(filename, 'rb') as fp:
+    with open(filename, "rb") as fp:
         return pickle.load(fp)
 
 
 def savegrades(grades):
     filename = main.getsaveslot() + "\Grade\Grade.txt"
-    with open(filename, 'wb') as fp:
+    with open(filename, "wb") as fp:
         pickle.dump(grades, fp)
 
 
@@ -29,7 +29,7 @@ def getchapterscore(a, b):
     wronguser = []
     wrongcorrect = []
     for i in range(len(a)):
-        if (a[i] == b[i]):
+        if a[i] == b[i]:
             sum += 1
             wronguser.append(str(a[i]))
             wrongcorrect.append(str(a[i]))
@@ -42,8 +42,10 @@ def getchapterscore(a, b):
 
 def givechapters(answerlist, trueanswerlist):
     shuffle = main.getsaveslot()
-    shuffle = pickle.load(open(shuffle + '\Grade\Order.txt', 'rb'))
-    trueanswerlist = [trueanswerlist[i].replace('\\\\', '\\') for i in range(len(trueanswerlist))]
+    shuffle = pickle.load(open(shuffle + "\Grade\Order.txt", "rb"))
+    trueanswerlist = [
+        trueanswerlist[i].replace("\\\\", "\\") for i in range(len(trueanswerlist))
+    ]
     finalanswerlist = [0 for i in range(len(trueanswerlist))]
     finaltruelist = [0 for i in range(len(trueanswerlist))]
     for k in range(len(answerlist) - 1):
@@ -85,12 +87,12 @@ class Window(PySide6.QtWidgets.QDialog):
         self.Box5 = PySide6.QtWidgets.QLabel()
         self.Box6 = PySide6.QtWidgets.QLabel()
 
-        self.Box1.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        self.Box2.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        self.Box3.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        self.Box4.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        self.Box5.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        self.Box6.setFont(PySide6.QtGui.QFont('Aptos', 16))
+        self.Box1.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        self.Box2.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        self.Box3.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        self.Box4.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        self.Box5.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        self.Box6.setFont(PySide6.QtGui.QFont("Aptos", 16))
 
         a = PySide6.QtWidgets.QLabel()
         b = PySide6.QtWidgets.QLabel()
@@ -106,12 +108,12 @@ class Window(PySide6.QtWidgets.QDialog):
         e.setText("ציון כמותי:")
         f.setText("ציון מילולי:")
 
-        a.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        b.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        c.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        d.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        e.setFont(PySide6.QtGui.QFont('Aptos', 16))
-        f.setFont(PySide6.QtGui.QFont('Aptos', 16))
+        a.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        b.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        c.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        d.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        e.setFont(PySide6.QtGui.QFont("Aptos", 16))
+        f.setFont(PySide6.QtGui.QFont("Aptos", 16))
 
         alist, tlist = givechapters(answerlist, trueanswerlist)
         formLayout.addRow(self.Box1, a)
@@ -127,19 +129,19 @@ class Window(PySide6.QtWidgets.QDialog):
         engrawscore = 0
         answerLayout.setSpacing(10)
         for i in range(len(alist)):
-            alist[i]=alist[i][::-1]
-            if ('p' in tlist[i]):
-                tlist[i].remove('p')
+            alist[i] = alist[i][::-1]
+            if "p" in tlist[i]:
+                tlist[i].remove("p")
                 grade, wronguser, wrongcorrect = getchapterscore(alist[i], tlist[i])
                 long = PySide6.QtWidgets.QLabel(str(wrongcorrect))
             else:
                 grade, wronguser, wrongcorrect = getchapterscore(alist[i], tlist[i])
                 lenchapter = len(alist[i])
-                if (lenchapter == 20):
+                if lenchapter == 20:
                     mathrawscore += grade
-                elif (lenchapter == 22):
+                elif lenchapter == 22:
                     engrawscore += grade
-                elif (lenchapter == 23):
+                elif lenchapter == 23:
                     hebrawscore += grade
                 # hme
                 long = PySide6.QtWidgets.QLabel(str(wrongcorrect))
@@ -148,17 +150,21 @@ class Window(PySide6.QtWidgets.QDialog):
             shortbox = PySide6.QtWidgets.QLabel()
             longbox = PySide6.QtWidgets.QLabel()
             difbox = PySide6.QtWidgets.QLabel()
-            shortbox.setText("פרק 1 תשובות:".replace('1', str(i + 1)))
-            longbox.setText("פרק 1 תשובות נכונות:".replace('1', str(i + 1)))
-            difbox.setText("פרק 1 טעויות: 57".replace('1', str(i + 1)).replace('57', str(len(alist[i]) - grade)))
+            shortbox.setText("פרק 1 תשובות:".replace("1", str(i + 1)))
+            longbox.setText("פרק 1 תשובות נכונות:".replace("1", str(i + 1)))
+            difbox.setText(
+                "פרק 1 טעויות: 57".replace("1", str(i + 1)).replace(
+                    "57", str(len(alist[i]) - grade)
+                )
+            )
             dif = PySide6.QtWidgets.QLabel()
 
-            short.setFont(PySide6.QtGui.QFont('Aptos', 16))
-            dif.setFont(PySide6.QtGui.QFont('Aptos', 16))
-            long.setFont(PySide6.QtGui.QFont('Aptos', 16))
-            shortbox.setFont(PySide6.QtGui.QFont('Aptos', 16))
-            difbox.setFont(PySide6.QtGui.QFont('Aptos', 16))
-            longbox.setFont(PySide6.QtGui.QFont('Aptos', 16))
+            short.setFont(PySide6.QtGui.QFont("Aptos", 16))
+            dif.setFont(PySide6.QtGui.QFont("Aptos", 16))
+            long.setFont(PySide6.QtGui.QFont("Aptos", 16))
+            shortbox.setFont(PySide6.QtGui.QFont("Aptos", 16))
+            difbox.setFont(PySide6.QtGui.QFont("Aptos", 16))
+            longbox.setFont(PySide6.QtGui.QFont("Aptos", 16))
 
             answerLayout.addRow(short, shortbox)
             answerLayout.addRow(dif, difbox)
@@ -166,7 +172,9 @@ class Window(PySide6.QtWidgets.QDialog):
             answerLayout.addRow(PySide6.QtWidgets.QLabel())
             answerLayout.addRow(PySide6.QtWidgets.QLabel())
 
-        a, b, c = pdfbackend.givefinalscores([str(hebrawscore), str(mathrawscore), str(engrawscore)])
+        a, b, c = pdfbackend.givefinalscores(
+            [str(hebrawscore), str(mathrawscore), str(engrawscore)]
+        )
 
         self.Box1.setText(str(hebrawscore))
         self.Box2.setText(str(mathrawscore))
@@ -179,8 +187,11 @@ class Window(PySide6.QtWidgets.QDialog):
         dialogLayout.addLayout(answerLayout)
         dialogLayout.addWidget(pic)
         dialogLayout.addLayout(formLayout)
-        pic.setPixmap(PySide6.QtGui.QPixmap(main.getsaveslot() + r"\images\answer.png").scaledToHeight(
-            self.window().height() * int(2 * 1.414)))
+        pic.setPixmap(
+            PySide6.QtGui.QPixmap(
+                main.getsaveslot() + r"\images\answer.png"
+            ).scaledToHeight(self.window().height() * int(2 * 1.414))
+        )
         pic.setAlignment(PySide6.QtGui.Qt.AlignmentFlag.AlignTop)
 
         # self.ButtonExit = PySide6.QtWidgets.QPushButton(self.tr("Exit"))

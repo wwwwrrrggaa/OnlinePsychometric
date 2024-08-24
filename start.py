@@ -1,9 +1,12 @@
 # dialog.py
+import os
 import shutil
-
-appdatafolder = r"C:\Users\Public\Appdata"
-examsfolder = r"C:\Users\Public\Appdata\Exams\\"
-saveslot = r"C:\Users\Public\Appdata\Saves\save1"
+loadstate=0
+dir=os.path.realpath(__file__).replace("\start.py", "")+"\Data"
+appdatafolder = dir
+examsfolder = dir+"\Exams\\"
+saveslot = dir+"\Saves\save1"
+dirlib=dir+"\\"
 import main
 
 
@@ -17,7 +20,7 @@ def getappdata():
 
 
 def getexamsfolder(type):
-    return r"C:\Users\Public\Appdata\\" + type + '\\'
+    return dirlib + type + "\\"
 
 
 def updatesaveslot(value):
@@ -62,7 +65,7 @@ def getquarters(type, language, year):
     path = getexamsfolder(type) + language + "\\" + year
     listquarter = []
     for quarter in os.listdir(path):
-        if (len(quarter) == 1):
+        if len(quarter) == 1:
             quarter = quarter
         else:
             quarter = quarter[-5]
@@ -71,7 +74,7 @@ def getquarters(type, language, year):
 
 
 def getallslots():
-    return os.listdir(getappdata() + '\Saves')
+    return os.listdir(getappdata() + "\Saves")
 
 
 def gettimelimits():
@@ -80,7 +83,8 @@ def gettimelimits():
 
 def gettype():
     return ["FullExams", "Exams"]
-
+def getsaveslots():
+    return os.listdir(dir + "\Saves")
 
 class Window(QDialog):
     def updateyear(self):
@@ -90,11 +94,19 @@ class Window(QDialog):
 
     def updatequarter(self):
         self.Box3.clear()
-        self.Box3.addItems(getquarters(self.Box0.currentText(), self.Box1.currentText(), self.Box2.currentText()))
+        self.Box3.addItems(
+            getquarters(
+                self.Box0.currentText(),
+                self.Box1.currentText(),
+                self.Box2.currentText(),
+            )
+        )
 
     def updatelanguage(self):
         self.Box1.clear()
-        self.Box1.addItems(os.listdir(r"C:\Users\Public\Appdata\\" + self.Box0.currentText()))
+        self.Box1.addItems(
+            os.listdir(dirlib + self.Box0.currentText())
+        )
 
     @staticmethod
     def _on_destroyed(self):
@@ -102,11 +114,17 @@ class Window(QDialog):
         main.mainapp(exam, timer)
 
     def Start(self):
-        global exam, timer, saveslot, examtype
-        exam = getexamsfolder(
-            self.Box0.currentText()) + self.Box1.currentText() + '\\' + self.Box2.currentText() + '\\' + self.Box3.currentText()
-        if (os.path.isdir(exam)):
-            if (self.Box0.currentText() == "Exams"):
+        global exam, timer, saveslot, examtype,loadstate
+        exam = (
+            getexamsfolder(self.Box0.currentText())
+            + self.Box1.currentText()
+            + "\\"
+            + self.Box2.currentText()
+            + "\\"
+            + self.Box3.currentText()
+        )
+        if os.path.isdir(exam):
+            if self.Box0.currentText() == "Exams":
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
@@ -115,18 +133,78 @@ class Window(QDialog):
                 updatesaveslot(self.Box5.currentText())
                 timer = self.Box4.currentText()
                 self.close()
-                examtype = 2
-            imgpath = exam + r'\\answer.png'
-            shutil.copy(imgpath, r"C:\Users\Public\Appdata\Saves\\" + getsaveslot() + r"\images\answer.png")
+                examtype = 0
+            imgpath = exam + r"\\answer.png"
+            shutil.copy(
+                imgpath,
+                dirlib+r"Saves\\"
+                + getsaveslot()
+                + r"\images\answer.png",
+            )
+            loadstate=0
         else:
             pass
 
+    def load(self):
+        global loadstate
+        updatesaveslot(dirlib+"Saves\\"+self.BoxSaves.currentText())
+        loadstate=1
+        self.close()
+    def SwitchMode(self):
+        index = self.formLayout.count()
+        index2=index
+        layou2 = QFormLayout()
+        if(self.ButtonMode.text()=="Load from save"):
+            while (index >= 1):
+                myWidget = self.formLayout.itemAt(0).widget()
+                myWidget.setParent(None)
+                index -= 1
+            self.BoxSaves = QComboBox()
+            self.BoxSaves.addItems(getallslots())
+            self.formLayout.addRow("Save slot:", self.BoxSaves)
+            self.ButtonMode.setText("Start new exam")
+            self.ButtonOk.setParent(None)
+            self.ButtonOk = QPushButton(self.tr("Enter Exam"))
+            self.dialogLayout.addWidget(self.ButtonOk)
+            self.ButtonOk.clicked.connect(self.load)
+        else:
+            while (index >= 1):
+                myWidget = self.formLayout.itemAt(0).widget()
+                myWidget.setParent(None)
+                index -= 1
+            self.Box0 = QComboBox()
+            self.Box1 = QComboBox()
+            self.Box2 = QComboBox()
+            self.Box3 = QComboBox()
+            self.Box4 = QComboBox()
+            self.Box5 = QComboBox()
+            self.Box0.addItems(gettype())
+            self.Box1.addItems(getlanguage())
+            self.Box4.addItems(gettimelimits())
+            self.Box5.addItems(getallslots())
+            self.formLayout.addRow("Version:", self.Box0)
+            self.formLayout.addRow("Language:", self.Box1)
+            self.formLayout.addRow("Year:", self.Box2)
+            self.formLayout.addRow("Quarter:", self.Box3)
+            self.formLayout.addRow("TimeLimit:", self.Box4)
+            self.formLayout.addRow("Choose save slot", self.Box5)
+            self.Box0.activated.connect(self.updatelanguage)
+            self.Box1.activated.connect(self.updateyear)
+            self.Box2.activated.connect(self.updatequarter)
+            self.updatelanguage()
+            self.updateyear()
+            self.updatequarter()
+            self.ButtonMode.setText("Load from save")
+            self.ButtonOk.setParent(None)
+            self.ButtonOk = QPushButton(self.tr("Enter Exam"))
+            self.dialogLayout.addWidget(self.ButtonOk)
+            self.ButtonOk.clicked.connect(self.Start)
     def __init__(self):
         super().__init__(parent=None)
         # self.connect(Window._on_destroyed)
         self.setWindowTitle("ChooseExam")
-        dialogLayout = QVBoxLayout()
-        formLayout = QFormLayout()
+        self.dialogLayout=dialogLayout = QVBoxLayout()
+        self.formLayout=formLayout = QFormLayout()
         self.Box0 = QComboBox()
         self.Box1 = QComboBox()
         self.Box2 = QComboBox()
@@ -148,14 +226,15 @@ class Window(QDialog):
         self.Box2.activated.connect(self.updatequarter)
 
         dialogLayout.addLayout(formLayout)
-        self.ButtonOk = QPushButton(self.tr("Ok"))
-        self.ButtonExit = QPushButton(self.tr("Exit"))
+        self.ButtonOk = QPushButton(self.tr("Start Exam"))
+        self.ButtonMode = QPushButton(self.tr("Load from save"))
+        dialogLayout.addWidget(self.ButtonMode)
         dialogLayout.addWidget(self.ButtonOk)
-        dialogLayout.addWidget(self.ButtonExit)
 
         self.setLayout(dialogLayout)
 
         self.ButtonOk.clicked.connect(self.Start)
+        self.ButtonMode.clicked.connect(self.SwitchMode)
 
 
 if __name__ == "__main__":
@@ -163,7 +242,4 @@ if __name__ == "__main__":
     window = Window()
     window.show()
     app.exec()
-    if (examtype == 1):
-        main.mainapp(exam, timer, getsaveslot())
-    else:
-        main.mainfullapp(exam, timer, getsaveslot())
+    main.mainapp(exam, timer, [saveslot,loadstate,examtype])
